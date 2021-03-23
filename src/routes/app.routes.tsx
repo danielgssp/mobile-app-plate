@@ -1,20 +1,34 @@
-import React from 'react';
+import React, {useState} from 'react';
 import Home from '../screens/Home';
 import OpenCamera from '../screens/OpenCamera';
+import * as RootNavigation from './RootNavigation.routes';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import {StyleSheet, View, TouchableOpacity} from 'react-native';
-import {createStackNavigator, TransitionSpecs} from '@react-navigation/stack';
-
-Icon.loadFont();
+import {
+  createStackNavigator,
+  TransitionSpecs,
+  StackScreenProps,
+} from '@react-navigation/stack';
 
 type RootStackParamList = {
   Home: {};
-  OpenCamera: {platePattern: boolean};
+  OpenCamera: {visibleMenu: boolean};
 };
+
+export type Props = StackScreenProps<RootStackParamList, 'OpenCamera'>;
 
 const AppStack = createStackNavigator<RootStackParamList>();
 
 const AppRoutes: React.FC = () => {
+  const [visibleMenu, setVisibleMenu] = useState(false);
+
+  const handlerVisibleMenu = () => {
+    setVisibleMenu(!visibleMenu);
+    RootNavigation.navigationRef.current?.setParams({
+      visibleMenu: !visibleMenu,
+    });
+  };
+
   return (
     <View style={styles.container}>
       <AppStack.Navigator
@@ -39,8 +53,10 @@ const AppRoutes: React.FC = () => {
           options={{
             title: 'Reconhecimento de Placas',
             headerRight: () => (
-              <TouchableOpacity>
-                {/* <Icon name="glass" size={30} /> */}
+              <TouchableOpacity
+                style={styles.camera}
+                onPress={() => RootNavigation.navigate('OpenCamera')}>
+                <Icon name="camera" size={24} color="#b900e7" />
               </TouchableOpacity>
             ),
           }}
@@ -48,8 +64,18 @@ const AppRoutes: React.FC = () => {
 
         <AppStack.Screen
           name="OpenCamera"
+          initialParams={{visibleMenu: false}}
           component={OpenCamera}
-          options={{title: 'Camera'}}
+          options={{
+            title: 'Camera',
+            headerRight: () => (
+              <TouchableOpacity
+                style={styles.camera}
+                onPress={handlerVisibleMenu}>
+                <Icon name="align-justify" size={24} color="#b900e7" />
+              </TouchableOpacity>
+            ),
+          }}
         />
       </AppStack.Navigator>
     </View>
@@ -59,6 +85,15 @@ const AppRoutes: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  camera: {
+    width: 34,
+    height: 34,
+    marginRight: 8,
+    borderRadius: 17,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#FFF',
   },
 });
 
