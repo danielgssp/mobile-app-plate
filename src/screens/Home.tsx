@@ -20,6 +20,7 @@ const Home: React.FC = () => {
 
     if (listPlates) {
       setPlates(listPlates);
+      setPlateFilter(listPlates);
     }
   }
 
@@ -41,7 +42,15 @@ const Home: React.FC = () => {
     setText(value);
   };
 
-  useEffect(() => {}, [plates, text]);
+  const onRenderListPlates = () => {
+    return plateFilter?.map((it, id) => {
+      return (
+        <Text style={styles.plateText} key={id}>
+          {it}
+        </Text>
+      );
+    });
+  };
 
   return (
     <View style={styles.container}>
@@ -60,15 +69,7 @@ const Home: React.FC = () => {
 
       <View style={styles.listContainer}>
         <Text style={styles.listText}>Lista de Placas cadastradas</Text>
-        <ScrollView style={styles.list}>
-          {plateFilter?.map((it, id) => {
-            return (
-              <Text style={styles.plateText} key={id}>
-                {it}
-              </Text>
-            );
-          })}
-        </ScrollView>
+        <ScrollView style={styles.list}>{onRenderListPlates()}</ScrollView>
       </View>
     </View>
   );
